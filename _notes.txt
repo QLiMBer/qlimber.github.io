@@ -25,7 +25,10 @@ https://pages.github.com/
             - open Git Bash
             - set a Git username: git config --global user.name "QLiMBer"
             - (confirmation it was done correctly: git config --global user.name)
-            
+            - https://docs.github.com/en/account-and-profile/setting-up-and-managing-your-personal-account-on-github/managing-email-preferences/setting-your-commit-email-address
+            - in Access section "Add email address" ->
+        - install Jekyll https://jekyllrb.com/docs/installation/
+        - https://github.com/pages-themes/hacker
              
     
     
