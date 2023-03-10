@@ -1,7 +1,35 @@
+1) Set up qlimber.github.io user site
 https://pages.github.com/
     - user site
     - new repository qlimber.github.io
     - Set up in Desktop -> clone
     - create index.html in local clone, e.g. "C:\Users\mirek\Documents\GitHub\qlimber.github.io"
     - commit & publish
-    - open qlimber.github.io 
+    - open qlimber.github.io
+    
+2) Set up Jekyll to switch from html to markdown
+    - Navigate to repository, e.g. https://github.com/QLiMBer/qlimber.github.io
+    - https://docs.github.com/en/pages/getting-started-with-github-pages/configuring-a-publishing-source-for-your-github-pages-site
+    - navigate to particular branch which will be publishing source
+    - settings -> pages -> Deploy from a branch
+    - my setup: main branch, /doc folder
+    - Save (under Branch)
+    
+    - https://docs.github.com/en/pages/setting-up-a-github-pages-site-with-jekyll/creating-a-github-pages-site-with-jekyll
+        - install ruby https://www.ruby-lang.org/en/documentation/installation/
+            - https://rubyinstaller.org/
+            - my version: Ruby+Devkit 3.1.3-1 (x64)
+        - install git https://docs.github.com/en/get-started/quickstart/set-up-git
+            - my version: https://github.com/git-for-windows/git/releases/download/v2.39.2.windows.1/Git-2.39.2-64-bit.exe
+            - all default
+            - open Git Bash
+            - set a Git username: git config --global user.name "QLiMBer"
+            - (confirmation it was done correctly: git config --global user.name)
+            
+             
+    
+    
+    - Adding a theme to your GitHub Pages site using Jekyll (https://docs.github.com/en/pages/setting-up-a-github-pages-site-with-jekyll/adding-a-theme-to-your-github-pages-site-using-jekyll)
+    - https://docs.github.com/en/pages/setting-up-a-github-pages-site-with-jekyll
+    - select from supported themes at https://pages.github.com/themes/ -> hacker
+    
