@@ -1,0 +1,7 @@
+https://pages.github.com/
+    - user site
+    - new repository qlimber.github.io
+    - Set up in Desktop -> clone
+    - create index.html in local clone, e.g. "C:\Users\mirek\Documents\GitHub\qlimber.github.io"
+    - commit & publish
+    - open qlimber.github.io 
