@@ -1,7 +1,7 @@
 ---
 layout: post
 title:  "Welcome to Jekyll!"
-permalink: https://qlimber.github.io
+permalink: /
 date:   2023-03-10 22:49:30 +0100
 categories: jekyll update
 ---
