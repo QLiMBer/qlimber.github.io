@@ -112,6 +112,7 @@ This allows you to use the environment in Jupyter:
 python -m ipykernel install --user --name=<env_name>
 ```
 - Example: `python -m ipykernel install --user --name=myenv`
+
 Than you can select the kernel in Jupyter Notebook or Jupyter Lab.
 
 #### **5. List available Jupyter kernels:**
