@@ -15,7 +15,8 @@ layout: default
       <p>
         <strong>Tags:</strong>
         {% for tag in page.tags %}
-          <a href="{{ '/tags/#' | append: tag | slugify | relative_url }}">{{ tag }}</a>{% unless forloop.last %} · {% endunless %}
+          {% assign tag_slug = tag | slugify %}
+          <a href="{{ '/tags/#' | append: tag_slug | relative_url }}">{{ tag }}</a>{% unless forloop.last %} · {% endunless %}
         {% endfor %}
       </p>
     {% endif %}
@@ -23,7 +24,8 @@ layout: default
       <p>
         <strong>Categories:</strong>
         {% for category in page.categories %}
-          <a href="{{ '/categories/#' | append: category | slugify | relative_url }}">{{ category }}</a>{% unless forloop.last %} · {% endunless %}
+          {% assign category_slug = category | slugify %}
+          <a href="{{ '/categories/#' | append: category_slug | relative_url }}">{{ category }}</a>{% unless forloop.last %} · {% endunless %}
         {% endfor %}
       </p>
     {% endif %}
