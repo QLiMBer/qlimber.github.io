@@ -1,0 +1,34 @@
+---
+layout: default
+---
+
+<article class="post">
+  {{ content }}
+
+  {% assign has_tags = page.tags and page.tags.size > 0 %}
+  {% assign has_categories = page.categories and page.categories.size > 0 %}
+
+  {% if has_tags or has_categories %}
+  <hr>
+  <footer class="post-meta">
+    {% if has_tags %}
+      <p>
+        <strong>Tags:</strong>
+        {% for tag in page.tags %}
+          <a href="{{ '/tags/#' | append: tag | slugify | relative_url }}">{{ tag }}</a>{% unless forloop.last %} · {% endunless %}
+        {% endfor %}
+      </p>
+    {% endif %}
+    {% if has_categories %}
+      <p>
+        <strong>Categories:</strong>
+        {% for category in page.categories %}
+          <a href="{{ '/categories/#' | append: category | slugify | relative_url }}">{{ category }}</a>{% unless forloop.last %} · {% endunless %}
+        {% endfor %}
+      </p>
+    {% endif %}
+  </footer>
+  {% endif %}
+</article>
+
+
