@@ -94,36 +94,59 @@ Notes:
 - `midnight` and `hacker` do not provide a blog home layout, so the simple posts list is added to `index.md`.
 - Alternative to adding HTML in `index.md`: create your own `_layouts/home.html` that lists posts and set `index.md` back to `layout: home`.
 
-### Safe overrides (how to customize without touching the theme gem)
-- Footer text (remove duplicate site title or add custom text):
-  ```html
-  <!-- _includes/footer.html -->
-  <footer class="site-footer">
-    <div class="wrapper">
-      <p>{{ site.description }}</p>
-    </div>
-  </footer>
+### Implemented features (current state)
+- **Post defaults**: All posts automatically use `layout: post` via `_config.yml` defaults.
+  ```yaml
+  # _config.yml
+  defaults:
+    - scope: { path: "", type: posts }
+      values: { layout: post }
   ```
-- Change homepage heading or list markup (works with any theme):
+- **Permalinks**: Human-friendly URL structure.
+  ```yaml
+  # _config.yml
+  permalink: /:year/:month/:day/:title/
+  ```
+- **Tags & categories**: Clickable tags/categories on each post plus index pages at `/tags/` and `/categories/`.
+  - Local override layout: `_layouts/post.html` (renders linked tags/categories)
+  - Index pages: `tags.md`, `categories.md`
+- **Post template**: `_drafts/post-template.md` to quickly start new posts with consistent front matter.
+
+### Safe overrides (how to customize without touching the theme gem)
+- Post layout that links tags and categories (used in this site):
   ```html
-  <!-- _layouts/home.html -->
+  <!-- _layouts/post.html -->
   ---
   layout: default
   ---
-  <main class="page-content" aria-label="Content">
-    <div class="wrapper">
-      <h1>Blog</h1>
-      <ul class="post-list">
-        {% for post in site.posts %}
-          <li>
-            <span class="post-meta">{{ post.date | date: "%b %-d, %Y" }}</span>
-            <h2><a class="post-link" href="{{ post.url | relative_url }}">{{ post.title }}</a></h2>
-          </li>
+  <article class="post">
+    {{ content }}
+    {% assign has_tags = page.tags and page.tags.size > 0 %}
+    {% assign has_categories = page.categories and page.categories.size > 0 %}
+    {% if has_tags or has_categories %}
+    <hr>
+    <footer class="post-meta">
+      {% if has_tags %}
+        <p><strong>Tags:</strong>
+        {% for tag in page.tags %}
+          {% assign tag_slug = tag | slugify %}
+          <a href="{{ '/tags/#' | append: tag_slug | relative_url }}">{{ tag }}</a>{% unless forloop.last %} · {% endunless %}
         {% endfor %}
-      </ul>
-    </div>
-  </main>
+        </p>
+      {% endif %}
+      {% if has_categories %}
+        <p><strong>Categories:</strong>
+        {% for category in page.categories %}
+          {% assign category_slug = category | slugify %}
+          <a href="{{ '/categories/#' | append: category_slug | relative_url }}">{{ category }}</a>{% unless forloop.last %} · {% endunless %}
+        {% endfor %}
+        </p>
+      {% endif %}
+    </footer>
+    {% endif %}
+  </article>
   ```
+
 - Style tweaks:
   ```scss
   ---
@@ -133,34 +156,33 @@ Notes:
   .site-title { font-weight: 700; }
   ```
 
-### Recommended refinements to workflow (next steps)
-- Ensure posts get a consistent layout automatically:
-  ```yaml
-  # _config.yml
-  defaults:
-    - scope: { path: "", type: posts }
-      values: { layout: post }
-  ```
-- Optional navigation in header (for themes that support it):
-  ```yaml
-  header_pages:
-    - about.md
-    - projects.md
-  ```
-- Useful permalink style:
-  ```yaml
-  permalink: /:year/:month/:day/:title/
-  ```
-- Post front matter template for new posts:
-  ```yaml
-  ---
-  layout: post
-  title: "Your Post Title"
-  date: 2025-01-01
-  categories: [notes]
-  tags: [tag1, tag2]
-  ---
-  ```
+### Ideas / next steps
+- **Optional navigation in header**: Add quick links (e.g., `About`, `Projects`, `Tags`, `Categories`). `jekyll-theme-hacker` may not render `header_pages` by default; add your own `_includes/header.html` or `_includes/nav.html` to display links.
+  - Potential config if you adopt a theme that supports it:
+    ```yaml
+    header_pages:
+      - about.md
+      - projects.md
+      - tags.md
+      - categories.md
+    ```
+- **Analytics**:
+  - Google Analytics (GA4): add the gtag snippet in a custom `_includes/head.html` so it loads on all pages. Example skeleton:
+    ```html
+    <!-- _includes/head.html -->
+    <!-- Your GA4 gtag.js snippet here -->
+    ```
+  - GitHub Insights: for repository-level traffic (views/clones) use GitHub’s built-in Insights.
+  - Respect privacy and document what you track.
+
+### Workflow: add a new post (concise)
+1. Copy the template: `_drafts/post-template.md` → `_posts/YYYY-MM-DD-your-title.md`.
+2. Update front matter: `title`, `date` (match filename for clarity), `categories`, `tags`.
+3. Write content in Markdown below the front matter.
+4. Push to `main` — GitHub Pages will rebuild automatically.
+Notes:
+- Posts must include a front matter block (`---` at top) to be processed.
+- `layout: post` is auto-applied by defaults; you can override per post if needed.
 
 ### Local preview (fast feedback loop)
 - Windows: use WSL (Ubuntu). In shell:
