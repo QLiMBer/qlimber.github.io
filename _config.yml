@@ -1,3 +1,11 @@
 title: QLiMBer Blog
 description: My notes on various topics
 theme: jekyll-theme-hacker
+permalink: /:year/:month/:day/:title/
+
+defaults:
+  - scope:
+      path: ""
+      type: posts
+    values:
+      layout: post

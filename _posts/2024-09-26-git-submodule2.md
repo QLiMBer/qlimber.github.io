@@ -1,7 +1,9 @@
 ---
 layout: post
-title: "git_submodule2"
+title: "Git submodules 2"
 date: 2024-09-26
+categories: [development]
+tags: [git]
 ---
 
 

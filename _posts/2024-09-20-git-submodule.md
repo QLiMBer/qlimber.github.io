@@ -1,7 +1,9 @@
 ---
 layout: post
-title: "Git_submodules"
+title: "Git submodules"
 date: 2024-09-20
+categories: [development]
+tags: [git]
 ---
 
 ### Cheat Sheet: Setting Up and Managing a Shared Submodule Across Branches

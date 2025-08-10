@@ -2,6 +2,8 @@
 layout: post
 title: "anakonda-jupyter"
 date: 2024-09-28
+categories: [development]
+tags: [anaconda, jupyter]
 ---
 
 ### **Anaconda Environment & Jupyter Cheat Sheet**

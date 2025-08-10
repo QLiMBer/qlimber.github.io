@@ -1,3 +1,11 @@
+---
+layout: post
+title: "WSL AI Dev Setup (Codex CLI + GitHub"
+date: 2024-09-28
+categories: [development]
+tags: [ai, codex, github]
+---
+
 # 🚀 WSL AI Dev Setup (Codex CLI + GitHub)
 
 **Target:** Ubuntu 22.04 in WSL2
