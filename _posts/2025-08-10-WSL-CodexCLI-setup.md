@@ -1,7 +1,7 @@
 ---
 layout: post
 title: "WSL AI Dev Setup (Codex CLI + GitHub"
-date: 2024-09-28
+date: 2025-08-10
 categories: [development]
 tags: [ai, codex, github]
 ---
