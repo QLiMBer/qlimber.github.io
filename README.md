@@ -1,14 +1,16 @@
-## QLiMBer Blog – Maintenance Guide
+# QLiMBer Blog – Maintenance Guide
 
 A concise reference for how this site works, how to change themes and layout, and the safest ways to customize.
 
-### How the site works (GitHub Pages + Jekyll)
+## How the site works (GitHub Pages + Jekyll)
+
 - **Engine**: Jekyll (static site generator). GitHub Pages builds and hosts it automatically on each push to `main`.
 - **Content model**: Markdown posts under `_posts/` named `YYYY-MM-DD-slug.md`.
 - **Templates**: Provided by the selected theme. Jekyll merges your Markdown with theme layouts to generate HTML.
 - **Gem**: A Ruby package. Many themes (e.g., `minima`) are shipped as gems. You don’t edit the gem; you override parts of it in your repo when needed.
 
-### Repo file map (what controls what)
+## Repo file map (what controls what)
+
 - `_config.yml`: Global settings (site title/description, selected theme, permalink style, defaults).
 - `index.md`: The homepage. The layout you choose here determines how the front page renders.
 - `_posts/`: Blog posts. Each file can define `layout`, `title`, `date`, etc. in its front matter.
@@ -17,7 +19,8 @@ A concise reference for how this site works, how to change themes and layout, an
   - `_includes/*.html`: Small reusable fragments like `header.html`, `footer.html`.
   - `assets/main.scss` or `_sass/*.scss`: CSS overrides.
 
-### Built-in themes vs remote themes (practical notes)
+## Built-in themes vs remote themes (practical notes)
+
 - **Built-in themes** (auto-available on GitHub Pages): set `theme: theme-name` in `_config.yml`.
   - Blog-suitable, dark-friendly options you used:
     - `minima` (has blog layouts; can enable dark skin)
@@ -26,8 +29,10 @@ A concise reference for how this site works, how to change themes and layout, an
 - **Remote themes** (fetched from a GitHub repo): set `remote_theme:` and enable the plugin.
   - Example: `remote_theme: pages-themes/midnight@v0.2.0` plus plugin `jekyll-remote-theme`.
 
-### Theme switching cheatsheet (your three favorites)
+## Theme switching cheatsheet (your three favorites)
+
 - Minima (dark blog):
+
   ```yaml
   # _config.yml
   title: QLiMBer Blog
@@ -36,19 +41,23 @@ A concise reference for how this site works, how to change themes and layout, an
   minima:
     skin: dark
   ```
+  
   ```yaml
   # index.md (front matter only)
   ---
   layout: home
   ---
   ```
+
 - Built-in Midnight (dark):
+
   ```yaml
   # _config.yml
   title: QLiMBer Blog
   description: My notes on various topics
   theme: jekyll-theme-midnight
   ```
+  
   ```markdown
   # index.md (use default + posts list)
   ---
@@ -65,13 +74,16 @@ A concise reference for how this site works, how to change themes and layout, an
     {% endfor %}
   </ul>
   ```
+
 - Built-in Hacker (dark/green):
+
   ```yaml
   # _config.yml
   title: QLiMBer Blog
   description: My notes on various topics
   theme: jekyll-theme-hacker
   ```
+  
   ```markdown
   # index.md same as Midnight (use default + posts list)
   ---
@@ -90,30 +102,38 @@ A concise reference for how this site works, how to change themes and layout, an
   ```
 
 Notes:
+
 - `minima` provides a `home` layout that auto-lists posts, so `index.md` needs no HTML.
 - `midnight` and `hacker` do not provide a blog home layout, so the simple posts list is added to `index.md`.
 - Alternative to adding HTML in `index.md`: create your own `_layouts/home.html` that lists posts and set `index.md` back to `layout: home`.
 
-### Implemented features (current state)
+## Implemented features (current state)
+
 - **Post defaults**: All posts automatically use `layout: post` via `_config.yml` defaults.
+
   ```yaml
   # _config.yml
   defaults:
     - scope: { path: "", type: posts }
       values: { layout: post }
   ```
+
 - **Permalinks**: Human-friendly URL structure.
+
   ```yaml
   # _config.yml
   permalink: /:year/:month/:day/:title/
   ```
+
 - **Tags & categories**: Clickable tags/categories on each post plus index pages at `/tags/` and `/categories/`.
   - Local override layout: `_layouts/post.html` (renders linked tags/categories)
   - Index pages: `tags.md`, `categories.md`
 - **Post template**: `_drafts/post-template.md` to quickly start new posts with consistent front matter.
 
-### Safe overrides (how to customize without touching the theme gem)
+## Safe overrides (how to customize without touching the theme gem)
+
 - Post layout that links tags and categories (used in this site):
+
   ```html
   <!-- _layouts/post.html -->
   ---
@@ -148,6 +168,7 @@ Notes:
   ```
 
 - Style tweaks:
+
   ```scss
   ---
   ---
@@ -156,9 +177,11 @@ Notes:
   .site-title { font-weight: 700; }
   ```
 
-### Ideas / next steps
+## Ideas / next steps
+
 - **Optional navigation in header**: Add quick links (e.g., `About`, `Projects`, `Tags`, `Categories`). `jekyll-theme-hacker` may not render `header_pages` by default; add your own `_includes/header.html` or `_includes/nav.html` to display links.
   - Potential config if you adopt a theme that supports it:
+
     ```yaml
     header_pages:
       - about.md
@@ -166,26 +189,33 @@ Notes:
       - tags.md
       - categories.md
     ```
+
 - **Analytics**:
   - Google Analytics (GA4): add the gtag snippet in a custom `_includes/head.html` so it loads on all pages. Example skeleton:
+
     ```html
     <!-- _includes/head.html -->
     <!-- Your GA4 gtag.js snippet here -->
     ```
+
   - GitHub Insights: for repository-level traffic (views/clones) use GitHub’s built-in Insights.
   - Respect privacy and document what you track.
 
-### Workflow: add a new post (concise)
+## Workflow: add a new post (concise)
+
 1. Copy the template: `_drafts/post-template.md` → `_posts/YYYY-MM-DD-your-title.md`.
 2. Update front matter: `title`, `date` (match filename for clarity), `categories`, `tags`.
 3. Write content in Markdown below the front matter.
 4. Push to `main` — GitHub Pages will rebuild automatically.
 Notes:
+
 - Posts must include a front matter block (`---` at top) to be processed.
 - `layout: post` is auto-applied by defaults; you can override per post if needed.
 
-### Local preview (fast feedback loop)
+## Local preview (fast feedback loop)
+
 - Windows: use WSL (Ubuntu). In shell:
+
   ```bash
   gem install bundler
   bundle init
@@ -193,16 +223,19 @@ Notes:
   bundle exec jekyll serve --livereload
   # open http://127.0.0.1:4000
   ```
+
 - This uses the same versions GitHub Pages builds with.
 
-### Troubleshooting quick answers
+## Troubleshooting quick answers
+
 - Empty homepage after switching theme:
   - Cause: the theme lacks a `home` layout.
   - Fix: use `layout: default` with the posts list HTML in `index.md`, or create an override `_layouts/home.html` that lists posts and set `index.md` to `layout: home`.
 - Duplicate site title appearing in multiple places:
   - Header/footer are pulling `site.title` and `site.description` from `_config.yml`. Override `_includes/footer.html` to change what shows.
 
-### Theme links
+## Theme links
+
 - Minima: `https://github.com/jekyll/minima`
 - Midnight (built-in and remote): `https://github.com/pages-themes/midnight`
 - Hacker: `https://github.com/pages-themes/hacker`
