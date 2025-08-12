@@ -147,6 +147,26 @@ cd ~/projects
 git clone git@github.com:YourUser/your-repo.git
 ```
 
+### **Git + Codex SSH**
+
+- **SSH passphrase in the same terminal**: Provide your SSH key passphrase in the same terminal where you plan to run `codex`. The `codex` CLI cannot prompt for the SSH key passphrase itself (tested in codex-cli 0.20.0). Trigger the prompt first with a harmless Git command, for example:
+
+  ```bash
+  git status
+  ```
+
+- **Set remote manually (SSH)**: If you configure the Git remote yourself, use the SSH URL:
+
+  ```bash
+  git remote set-url origin git@github.com:username/repo.git
+  ```
+
+- **Letting codex init Git**: If you let `codex` initialize and configure Git, supply an SSH URL (not HTTPS), for example:
+
+  ```text
+  git@github.com:user/git-remote-test.git
+  ```
+
 ✅ Keeps everything on ext4 for speed and avoids CRLF issues.
 
 ---
@@ -170,6 +190,9 @@ git clone git@github.com:YourUser/your-repo.git
 ```bash
 # 1. Open WSL terminal (ssh-agent starts automatically from .bashrc)
 # 2. Run any git command (first use will prompt for passphrase)
+#    Tip: Do this in the same terminal where you'll run `codex`, e.g.:
+#    git status
+#    (codex cannot prompt for SSH key passphrase itself)
 ```
 
 After that, GitHub SSH will work without asking again until you close WSL or reboot.
