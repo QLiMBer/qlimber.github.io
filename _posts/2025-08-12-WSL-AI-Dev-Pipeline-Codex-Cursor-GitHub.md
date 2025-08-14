@@ -14,29 +14,42 @@ Use this guide to set up an end‑to‑end WSL AI development pipeline that keep
 - Commit, branch, and push from WSL with SSH keys.
 - Bonus: Codex + Cursor is a great combo; currently, OpenAI and Cursor are offering GPT‑5 testing in both with separate usage limits.
 
-**Target:** Ubuntu 22.04 in WSL2
+**Target:** Ubuntu 22.04 in WSL2 — this is the recommended default for Windows developers using Linux tooling in WSL **as of 2025**, because Ubuntu 22.04 LTS is widely supported, stable, and gets long-term updates. The instructions here assume this environment. If you’re using another distribution or release, some package commands or versions may differ, and future LTS releases may change the defaults.
 
 ---
 
-## **1️⃣ Install core packages**
+### **1️⃣ Update apt and check Node.js/npm**
 
 ```bash
-# Update apt
 sudo apt update && sudo apt upgrade -y
+node -v && npm -v  # Checks Node.js/npm versions, needs v20.x/v10.x or newer
+```
 
-# Remove any old Node/npm
+If both Node.js and npm are new enough, you can skip the Node.js upgrade steps.
+
+---
+
+### **2️⃣ Remove old Node/npm if needed**
+
+```bash
 sudo apt remove -y nodejs npm libnode-dev
 sudo apt autoremove -y
 sudo apt clean
+```
 
-# Install Node 20 LTS from NodeSource
+---
+
+### **3️⃣ Install latest Node.js LTS (if upgrade needed)**
+
+```bash
 curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -
 sudo apt install -y nodejs git
 
 # Verify
-node -v   # should be v20.x
-npm -v    # should be v10.x
+node -v && npm -v  #  Node.js/npm versions, should be v20.x/v10.x or newer
 ```
+
+**💡 Why the curl step is important:** Ubuntu’s default apt repository (even in 22.04 LTS) often ships older Node versions for stability. The `curl` command adds NodeSource’s repository to apt, which provides up-to-date Node.js builds. Without it, `apt install nodejs` would likely give you an outdated version (e.g., v12 on older setups), breaking modern tools like Codex CLI.
 
 ---
 
@@ -46,6 +59,15 @@ npm -v    # should be v10.x
 sudo npm install -g @openai/codex
 codex --version  # should show codex-cli 0.20.0 or similar
 ```
+If npm prompts about a newer major version being available, you can usually **ignore it** unless you specifically need the newest npm features. NodeSource ships the npm version bundled with the Node LTS release, which is tested for stability. To update anyway:
+
+```bash
+sudo npm install -g npm@latest
+```
+
+This is optional and mainly for users who want the very latest npm.
+
+---
 
 ### WSL authentication (headless browser) workaround
 
@@ -71,7 +93,7 @@ If `codex login` cannot open a browser inside WSL, use this SSH tunnel method fr
    # Auth server listens on http://localhost:1455 and prints an https://auth.openai.com/... URL
    ```
 
-4. Complete auth in Windows browser. It should redirect to `http://localhost:1455/success`. The WSL terminal will show "Successfully logged in".
+4.Click the URL with ctrl (or copy paste to browser) and complete auth in Windows browser. It should redirect to `http://localhost:1455/success`. The WSL terminal will show "Successfully logged in".
 
 5. Verify and clean up:
 
@@ -117,12 +139,8 @@ cat ~/.ssh/id_ed25519.pub
 
 ```bash
 mkdir -p ~/.ssh && chmod 700 ~/.ssh
-nano ~/.ssh/config
-```
-
-Paste:
-
-```sshconfig
+# The here‑doc below appends multiple lines non‑interactively, you can also paste the block between lines with EOF using nano.
+cat << 'EOF' > ~/.ssh/config
 Host *
     ForwardAgent no
     IdentitiesOnly yes
@@ -131,9 +149,11 @@ Host github.com
     HostName github.com
     User git
     IdentityFile ~/.ssh/id_ed25519
+EOF
 ```
 
 ```bash
+# Set correct permissions for SSH config file (required for SSH to work)
 chmod 600 ~/.ssh/config
 ```
 
@@ -142,8 +162,6 @@ chmod 600 ~/.ssh/config
 ## **5️⃣ Clone repos into WSL filesystem**
 
 ```bash
-mkdir -p ~/projects
-cd ~/projects
 git clone git@github.com:YourUser/your-repo.git
 ```
 
