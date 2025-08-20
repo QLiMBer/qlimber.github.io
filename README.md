@@ -1,5 +1,9 @@
 # QLiMBer Blog – Maintenance Guide
 
+## Live Site
+
+- Website: https://qlimber.github.io
+
 A concise reference for how this site works, how to change themes and layout, and the safest ways to customize.
 
 ## How the site works (GitHub Pages + Jekyll)
