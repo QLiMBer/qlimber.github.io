@@ -106,32 +106,80 @@ If `codex login` cannot open a browser inside WSL, use this SSH tunnel method fr
 
 ---
 
-## **3️⃣ Create SSH key for GitHub**
+## **3️⃣ Create SSH key for GitHub (shared ssh-agent)**
 
 ```bash
 ssh-keygen -t ed25519 -C "your_email@example.com"
-# Press Enter for defaults, set a passphrase for safety
+# Press Enter for defaults; set a passphrase to protect the key
+```
 
-# Start ssh-agent automatically
-echo 'eval "$(ssh-agent -s)"' >> ~/.bashrc
+Next, configure a single ssh-agent that survives for the whole WSL session and unlock it the first time you run `git` or `codex`:
 
-# Auto-load key on first Git use per session
-cat << 'EOF' >> ~/.bashrc
+```bash
+cat <<'EOF' >> ~/.profile
+SSH_ENV="$HOME/.ssh/agent.env"
 
-# Auto-load SSH key when Git is first used
+start_ssh_agent() {
+    eval "$(ssh-agent -s)" >/dev/null
+    cat >"$SSH_ENV" <<EOT
+export SSH_AUTH_SOCK=$SSH_AUTH_SOCK
+export SSH_AGENT_PID=$SSH_AGENT_PID
+EOT
+    chmod 600 "$SSH_ENV"
+}
+
+if [ -z "$SSH_AUTH_SOCK" ]; then
+    if [ -f "$SSH_ENV" ]; then
+        . "$SSH_ENV" >/dev/null
+        kill -0 "$SSH_AGENT_PID" 2>/dev/null || start_ssh_agent
+    else
+        start_ssh_agent
+    fi
+fi
+EOF
+```
+
+Add wrappers in `~/.bashrc` so the first Git or Codex command prompts for the passphrase when a TTY is available, and otherwise reminds you to unlock the key manually:
+
+```bash
+cat <<'EOF' >> ~/.bashrc
+
+ensure_codex_key() {
+    if ssh-add -l >/dev/null 2>&1; then
+        return 0
+    fi
+    if [ -t 0 ] && [ -t 1 ]; then
+        echo "SSH key locked; enter passphrase to continue."
+        ssh-add ~/.ssh/id_ed25519
+    else
+        echo "SSH key locked; run ssh-add ~/.ssh/id_ed25519 in a shell first." >&2
+        return 1
+    fi
+}
+
 git() {
-    ssh-add -l >/dev/null 2>&1 || ssh-add ~/.ssh/id_ed25519
+    ensure_codex_key || return $?
     command git "$@"
 }
-EOF
-source ~/.bashrc
 
-# Show public key to add to GitHub
+codex() {
+    ensure_codex_key || return $?
+    command codex "$@"
+}
+EOF
+
+source ~/.profile
+```
+
+`~/.ssh/agent.env` now stores the active agent socket for the current WSL session. The first call to `git` or `codex` after opening a terminal prompts for the key; later calls reuse the unlocked agent until you close WSL or kill the agent manually.
+
+Show the public key so you can add it to GitHub:
+
+```bash
 cat ~/.ssh/id_ed25519.pub
 ```
 
-**→ Copy & paste** into GitHub:
-*Settings → SSH and GPG keys → New SSH key*
+**→ Copy & paste** the output into *Settings → SSH and GPG keys → New SSH key* on GitHub.
 
 ---
 
@@ -167,11 +215,7 @@ git clone git@github.com:YourUser/your-repo.git
 
 ### **Git + Codex SSH**
 
-- **SSH passphrase in the same terminal**: Provide your SSH key passphrase in the same terminal where you plan to run `codex`. The `codex` CLI cannot prompt for the SSH key passphrase itself (tested in codex-cli 0.20.0). Trigger the prompt first with a harmless Git command, for example:
-
-  ```bash
-  git status
-  ```
+- **Automatic passphrase prompt**: The `ensure_codex_key` helper added above prompts the first time you run either `git` or `codex` in a new WSL session. If you forget to unlock the key before running Codex, the wrapper prints a reminder to run `ssh-add ~/.ssh/id_ed25519` in a shell with a TTY.
 
 - **Set remote manually (SSH)**: If you configure the Git remote yourself, use the SSH URL:
 
@@ -206,11 +250,9 @@ git clone git@github.com:YourUser/your-repo.git
 ## **📅 First-use checklist after reboot**
 
 ```bash
-# 1. Open WSL terminal (ssh-agent starts automatically from .bashrc)
-# 2. Run any git command (first use will prompt for passphrase)
-#    Tip: Do this in the same terminal where you'll run `codex`, e.g.:
-#    git status
-#    (codex cannot prompt for SSH key passphrase itself)
+# 1. Open a WSL terminal (shared ssh-agent is restored via ~/.profile)
+# 2. Run git or codex once to unlock the key; you'll be prompted the first time only
+#    If Codex says "SSH key locked", run ssh-add ~/.ssh/id_ed25519 in a terminal with a prompt
 ```
 
 After that, GitHub SSH will work without asking again until you close WSL or reboot.
