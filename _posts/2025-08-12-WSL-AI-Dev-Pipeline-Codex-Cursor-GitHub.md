@@ -259,10 +259,27 @@ After that, GitHub SSH will work without asking again until you close WSL or reb
 
 ---
 
-Now you’ve got:
+Now you've got:
 
 - Latest Node.js + npm
 - Codex CLI
 - Fast, secure GitHub SSH access with 1 passphrase per session
-- Projects on WSL’s native filesystem
+- Projects on WSL's native filesystem
 - Seamless IDE integration
+
+---
+
+## **📝 Notes**
+
+### Git on Ubuntu 22.04 LTS (Jammy)
+
+Ubuntu LTS prioritizes stability, so `apt install git` installs the older, supported Git 2.34.x with security backports. This is fine for this pipeline, but if you want newer Git features/fixes, use the official upstream PPA:
+
+```bash
+sudo add-apt-repository ppa:git-core/ppa
+sudo apt update
+sudo apt install git
+git --version
+```
+
+Reference: [Git downloads for Linux and Unix](https://git-scm.com/downloads/linux).
