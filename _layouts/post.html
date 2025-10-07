@@ -3,15 +3,22 @@ layout: default
 ---
 
 <article class="post">
+  <header class="post-header">
+    <h1>{{ page.title }}</h1>
+    {% if page.subtitle %}
+      <p class="post-subtitle">{{ page.subtitle }}</p>
+    {% endif %}
+  </header>
+
   {{ content }}
 
-  {% assign has_tags = page.tags and page.tags.size > 0 %}
-  {% assign has_categories = page.categories and page.categories.size > 0 %}
+  {% assign has_tags = page.tags | default: empty %}
+  {% assign has_categories = page.categories | default: empty %}
 
-  {% if has_tags or has_categories %}
+  {% if has_tags != empty or has_categories != empty %}
   <hr>
   <footer class="post-meta">
-    {% if has_tags %}
+    {% if has_tags != empty %}
       <p>
         <strong>Tags:</strong>
         {% for tag in page.tags %}
@@ -20,7 +27,7 @@ layout: default
         {% endfor %}
       </p>
     {% endif %}
-    {% if has_categories %}
+    {% if has_categories != empty %}
       <p>
         <strong>Categories:</strong>
         {% for category in page.categories %}
@@ -32,5 +39,3 @@ layout: default
   </footer>
   {% endif %}
 </article>
-
-

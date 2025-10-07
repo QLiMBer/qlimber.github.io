@@ -1,0 +1,140 @@
+{% if site.ga_measurement_id and site.ga_measurement_id != '' %}
+<script>
+(function () {
+  var GA_ID = '{{ site.ga_measurement_id | strip | escape }}';
+  if (!GA_ID) { return; }
+
+  var CONSENT_KEY = 'ga_consent_state';
+  var bannerId = 'cookie-consent';
+  var prefsSelector = '[data-cookie-preferences]';
+  var consentState = null;
+  window['ga-disable-' + GA_ID] = true;
+
+  function safeGet(key) {
+    try {
+      return window.localStorage.getItem(key);
+    } catch (err) {
+      return null;
+    }
+  }
+
+  function safeSet(key, value) {
+    try {
+      if (value === null) {
+        window.localStorage.removeItem(key);
+      } else {
+        window.localStorage.setItem(key, value);
+      }
+    } catch (err) {
+      /* ignore */
+    }
+  }
+
+  function removeBanner() {
+    var existing = document.getElementById(bannerId);
+    if (existing) {
+      existing.remove();
+    }
+  }
+
+  function setBodyState(value) {
+    document.body.setAttribute('data-ga-consent', value || 'unset');
+  }
+
+  function loadGA() {
+    if (window.__gaLoaded) { return; }
+    window['ga-disable-' + GA_ID] = false;
+
+    var script = document.createElement('script');
+    script.async = true;
+    script.src = 'https://www.googletagmanager.com/gtag/js?id=' + GA_ID;
+    document.head.appendChild(script);
+
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){ window.dataLayer.push(arguments); }
+    window.gtag = gtag;
+    gtag('js', new Date());
+    gtag('config', GA_ID, { 'anonymize_ip': true });
+
+    window.__gaLoaded = true;
+  }
+
+  function disableGA() {
+    window['ga-disable-' + GA_ID] = true;
+    if (typeof window.gtag === 'function') {
+      window.gtag('consent', 'update', { 'analytics_storage': 'denied' });
+    }
+  }
+
+  function showBanner(focusButton) {
+    if (document.getElementById(bannerId)) {
+      if (focusButton) {
+        var btn = document.querySelector('#' + bannerId + ' button.primary');
+        if (btn) { btn.focus(); }
+      }
+      return;
+    }
+
+    var banner = document.createElement('div');
+    banner.id = bannerId;
+    banner.setAttribute('role', 'dialog');
+    banner.setAttribute('aria-live', 'polite');
+    banner.setAttribute('aria-modal', 'true');
+    banner.innerHTML = [
+      '<h2>Cookie Consent</h2>',
+      '<p>This site uses Google Analytics cookies to understand visitor traffic. These analytics load only after you opt in.</p>',
+      '<p>You can learn more in the <a href="{{ '/privacy-policy/' | relative_url }}">privacy policy</a>.</p>',
+      '<div id="cookie-consent-actions">',
+        '<button type="button" class="secondary" data-action="decline">Decline</button>',
+        '<button type="button" class="primary" data-action="accept">Accept</button>',
+      '</div>'
+    ].join('');
+
+    var declineBtn = banner.querySelector('[data-action="decline"]');
+    var acceptBtn = banner.querySelector('[data-action="accept"]');
+
+    declineBtn.addEventListener('click', function () {
+      removeBanner();
+      safeSet(CONSENT_KEY, 'denied');
+      setBodyState('denied');
+      disableGA();
+    });
+
+    acceptBtn.addEventListener('click', function () {
+      removeBanner();
+      safeSet(CONSENT_KEY, 'granted');
+      setBodyState('granted');
+      loadGA();
+    });
+
+    document.body.appendChild(banner);
+    if (focusButton && acceptBtn) { acceptBtn.focus(); }
+  }
+
+  function openPreferences(event) {
+    if (event) { event.preventDefault(); }
+    removeBanner();
+    safeSet(CONSENT_KEY, null);
+    disableGA();
+    setBodyState('unset');
+    showBanner(true);
+  }
+
+  consentState = safeGet(CONSENT_KEY);
+  if (consentState === 'granted') {
+    setBodyState(consentState);
+    loadGA();
+  } else if (consentState === 'denied') {
+    setBodyState(consentState);
+    disableGA();
+  } else {
+    setBodyState('unset');
+    showBanner(false);
+  }
+
+  document.querySelectorAll(prefsSelector).forEach(function (el) {
+    el.addEventListener('click', openPreferences);
+  });
+})();
+</script>
+{% endif %}

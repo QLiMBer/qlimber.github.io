@@ -20,8 +20,48 @@ A concise reference for how this site works, how to change themes and layout, an
 - `_posts/`: Blog posts. Each file can define `layout`, `title`, `date`, etc. in its front matter.
 - Optional override points (only create if you need to customize):
   - `_layouts/*.html`: Page skeletons. Create to override a theme’s layout.
-  - `_includes/*.html`: Small reusable fragments like `header.html`, `footer.html`.
+  - `_includes/*.html`: Small reusable fragments like `header.html`, `footer.html`, analytics helpers.
   - `assets/main.scss` or `_sass/*.scss`: CSS overrides.
+- Additional project files:
+  - `_layouts/default.html`: Custom wrapper that injects nav links and analytics consent.
+  - `_layouts/page.html`: Simple page layout that displays the title.
+  - `_layouts/post.html`: Post layout with title header plus tag/category footer.
+  - `_includes/head-custom.html`: Inline CSS for the cookie consent banner.
+  - `_includes/analytics-consent.html`: Banner + GA initialisation logic (honours consent & IP anonymisation).
+  - `privacy-policy.md`: Published policy linked from the header.
+
+## Local development workflow
+
+1. **Install Ruby (once per machine)**  
+   Using `rbenv` keeps versions isolated:
+   ```bash
+   rbenv install 3.3.4
+   rbenv global 3.3.4
+   gem install bundler
+   ```
+
+2. **Install project gems**  
+   ```bash
+   cd ~/projects/qlimber.github.io
+   bundle config set path 'vendor/bundle'
+   bundle install
+   ```
+
+3. **Run a live preview**  
+   ```bash
+   bundle exec jekyll serve --livereload
+   ```
+   Open `http://127.0.0.1:4000/`. Test the cookie banner: consenting loads GA (with `anonymize_ip`), declining keeps analytics disabled. Stop the server with `Ctrl+C`.
+
+4. **Production build check**  
+   ```bash
+   bundle exec jekyll build
+   ```
+   Inspect `_site/` if you need to review the generated HTML.
+
+5. **Optional QA**  
+   - `bundle exec htmlproofer ./_site --check-html` (if you install `htmlproofer`)  
+   - Manual smoketest of GA real-time dashboard after deploying and accepting the banner.
 
 ## Built-in themes vs remote themes (practical notes)
 
@@ -136,7 +176,7 @@ Notes:
 
 ## Safe overrides (how to customize without touching the theme gem)
 
-- Post layout that links tags and categories (used in this site):
+- Post layout that links tags and categories (current implementation):
 
   ```html
   <!-- _layouts/post.html -->
@@ -144,29 +184,34 @@ Notes:
   layout: default
   ---
   <article class="post">
+    <header class="post-header">
+      <h1>{{ page.title }}</h1>
+    </header>
+
     {{ content }}
-    {% assign has_tags = page.tags and page.tags.size > 0 %}
-    {% assign has_categories = page.categories and page.categories.size > 0 %}
-    {% if has_tags or has_categories %}
-    <hr>
-    <footer class="post-meta">
-      {% if has_tags %}
-        <p><strong>Tags:</strong>
-        {% for tag in page.tags %}
-          {% assign tag_slug = tag | slugify %}
-          <a href="{{ '/tags/#' | append: tag_slug | relative_url }}">{{ tag }}</a>{% unless forloop.last %} · {% endunless %}
-        {% endfor %}
-        </p>
-      {% endif %}
-      {% if has_categories %}
-        <p><strong>Categories:</strong>
-        {% for category in page.categories %}
-          {% assign category_slug = category | slugify %}
-          <a href="{{ '/categories/#' | append: category_slug | relative_url }}">{{ category }}</a>{% unless forloop.last %} · {% endunless %}
-        {% endfor %}
-        </p>
-      {% endif %}
-    </footer>
+
+    {% assign has_tags = page.tags | default: empty %}
+    {% assign has_categories = page.categories | default: empty %}
+    {% if has_tags != empty or has_categories != empty %}
+      <hr>
+      <footer class="post-meta">
+        {% if has_tags != empty %}
+          <p><strong>Tags:</strong>
+          {% for tag in page.tags %}
+            {% assign tag_slug = tag | slugify %}
+            <a href="{{ '/tags/#' | append: tag_slug | relative_url }}">{{ tag }}</a>{% unless forloop.last %} · {% endunless %}
+          {% endfor %}
+          </p>
+        {% endif %}
+        {% if has_categories != empty %}
+          <p><strong>Categories:</strong>
+          {% for category in page.categories %}
+            {% assign category_slug = category | slugify %}
+            <a href="{{ '/categories/#' | append: category_slug | relative_url }}">{{ category }}</a>{% unless forloop.last %} · {% endunless %}
+          {% endfor %}
+          </p>
+        {% endif %}
+      </footer>
     {% endif %}
   </article>
   ```
@@ -195,15 +240,10 @@ Notes:
     ```
 
 - **Analytics**:
-  - Google Analytics (GA4): add the gtag snippet in a custom `_includes/head.html` so it loads on all pages. Example skeleton:
-
-    ```html
-    <!-- _includes/head.html -->
-    <!-- Your GA4 gtag.js snippet here -->
-    ```
-
-  - GitHub Insights: for repository-level traffic (views/clones) use GitHub’s built-in Insights.
-  - Respect privacy and document what you track.
+  - GA4 is wired through `_includes/analytics-consent.html` and `_includes/head-custom.html`. Set `ga_measurement_id` in `_config.yml` to the correct `G-` ID.
+  - Consent banner stores state in `localStorage` and only loads GA after acceptance; declining keeps analytics disabled.
+  - Privacy Policy lives at `/privacy-policy/`; update it whenever tracking scope changes.
+  - GitHub Insights still provides basic repo traffic metrics if you need a double-check.
 
 ## Workflow: add a new post (concise)
 
@@ -218,17 +258,8 @@ Notes:
 
 ## Local preview (fast feedback loop)
 
-- Windows: use WSL (Ubuntu). In shell:
-
-  ```bash
-  gem install bundler
-  bundle init
-  bundle add github-pages webrick
-  bundle exec jekyll serve --livereload
-  # open http://127.0.0.1:4000
-  ```
-
-- This uses the same versions GitHub Pages builds with.
+- Follow the steps in [Local development workflow](#local-development-workflow). That uses Bundler with the exact GitHub Pages gem set.
+- On Windows, WSL2 is recommended. Run the commands from within your WSL shell; LiveReload still serves at `http://127.0.0.1:4000`.
 
 ## Troubleshooting quick answers
 

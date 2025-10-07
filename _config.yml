@@ -2,6 +2,7 @@ title: QLiMBer Blog
 description: My notes on various topics
 theme: jekyll-theme-hacker
 permalink: /:year/:month/:day/:title/
+ga_measurement_id: "G-JTX6QJ8XT6" # Set to GA4 Measurement ID (e.g., G-XXXXXXX)
 
 defaults:
   - scope:

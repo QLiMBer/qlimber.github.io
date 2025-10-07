@@ -6,15 +6,17 @@
 - `_drafts/`: Unpublished drafts; use `post-template.md` to start new posts.
 - `_layouts/`: HTML layouts overriding theme (e.g., `post.html`).
 - `index.md`: Home page; lists posts for built‑in themes.
+- `_includes/`: Reusable fragments (analytics consent, head customisations, etc.).
+- `privacy-policy.md`: Public privacy notice linked from the header nav.
 - `tags.md`, `categories.md`: Auto‑generated tag/category indices.
 
 ## Build, Test, and Development Commands
-- Local preview (Bundler):
-  - `gem install bundler jekyll` (once), optionally `bundle add github-pages`.
-  - `bundle exec jekyll serve --livereload` → serve at `http://localhost:4000`.
+- Ruby tooling: install via `rbenv` (e.g., `rbenv install 3.3.4`, `rbenv global 3.3.4`, `gem install bundler`).
+- Install gems per repo: `bundle config set path 'vendor/bundle'`, then `bundle install`.
+- Local preview: `bundle exec jekyll serve --livereload` (http://127.0.0.1:4000).
+- Production build check: `bundle exec jekyll build -d _site`.
 - Local preview (Docker alternative):
   - `docker run --rm -p 4000:4000 -v "$PWD":/srv/jekyll jekyll/jekyll jekyll serve`.
-- Production build check: `bundle exec jekyll build -d _site`.
 - Optional link check: `bundle exec htmlproofer ./_site --check-html` (if added).
 
 ## Coding Style & Naming Conventions
@@ -35,6 +37,7 @@
 
 ## Security & Configuration Tips
 - Use built‑in GitHub Pages themes or approved remote themes to avoid unsupported plugins.
-- Do not commit secrets; analytics snippets go in `_includes/head.html` if used.
+- GA4 is configured via `_config.yml` (`ga_measurement_id`) plus `_includes/analytics-consent.html`; keep IP anonymisation enabled and consent banner intact.
+- Do not commit secrets; analytics/custom scripts live in `_includes/` overrides as needed.
 
  
