@@ -240,8 +240,8 @@ Notes:
     ```
 
 - **Analytics**:
-  - GA4 is wired through `_includes/analytics-consent.html` and `_includes/head-custom.html`. Set `ga_measurement_id` in `_config.yml` to the correct `G-` ID.
-  - Consent banner stores state in `localStorage` and only loads GA after acceptance; declining keeps analytics disabled.
+  - GA4 is wired through `_includes/head-custom.html` (loads the standard gtag snippet with consent defaulted to denied for Search Console compatibility) and `_includes/analytics-consent.html` (banner + consent handling).
+  - Consent banner stores state in `localStorage` and only enables GA after acceptance; declining keeps analytics disabled and updates consent back to denied.
   - Privacy Policy lives at `/privacy-policy/`; update it whenever tracking scope changes.
   - GitHub Insights still provides basic repo traffic metrics if you need a double-check.
 

@@ -48,8 +48,8 @@ When we are ready to implement, we can iterate on the layout updates, run `bundl
 ## Consent Implementation Rationale (chosen approach)
 - Instead of relying on a third-party banner library, we implemented a custom consent component in Liquid/JS. That keeps dependencies small, avoids extra CDN calls, and gives full control over when GA is initialised.
 - Consent state lives in `localStorage` under `ga_consent_state`, with helpers to reopen the banner via “Cookie Preferences” in the site nav.
-- GA only loads after the visitor presses “Accept”. The script sets `window['ga-disable-GAID'] = true` by default, flips it on acceptance, and calls `gtag('config', …, { anonymize_ip: true })`.
-- On withdrawal we immediately run `gtag('consent', 'update', { analytics_storage: 'denied' })` and block future loads until re-consent.
+- The standard GA4 snippet now loads in the `<head>` (required for Search Console verification) but defaults consent to denied and sets `window['ga-disable-ID'] = true`. Only after acceptance do we flip consent to granted, enable the ID, and call `gtag('config', …, { anonymize_ip: true })`.
+- Subsequent opt-ins fire a manual `page_view` event; declines update consent back to denied so GA stops emitting hits.
 
 ## GA Configuration Notes
 - Enhanced measurement currently keeps only **Page views**, **Scrolls**, and **Outbound clicks** enabled; all other automatic events are disabled. Update the privacy policy if this list changes.

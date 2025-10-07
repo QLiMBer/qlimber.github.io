@@ -6,9 +6,9 @@ Our goals are to: (1) verify `https://qlimber.github.io` in Google Search Consol
 ## Workstreams & TODOs
 
 ### Google Analytics Console
-- [ ] Confirm `QLiMBer Projects` GA account has Editor access for your user.
+- [X] Confirm `QLiMBer Projects` GA account has Editor access for your user.
 - [x] Record the `G-` Measurement ID for the `qlimber.github.io` web data stream (set in `_config.yml`).
-- [ ] Set data retention to 14 months (Admin → Data settings → Data retention).
+- [X] Set data retention to 14 months (Admin → Data settings → Data retention).
 - [x] Review enhanced measurement settings; disable anything that conflicts with cookie consent strategy if needed (kept Page views, Scrolls, Outbound clicks only).
 
 ### Site Compliance Content
@@ -27,10 +27,10 @@ Our goals are to: (1) verify `https://qlimber.github.io` in Google Search Consol
 - [ ] Add meta title/description tags if needed to complement the new heading.
 
 ### Verification & QA
-- [ ] Deploy changes to GitHub Pages (publish branch and wait for build).
-- [ ] Validate locally with `bundle exec jekyll serve`, confirming:
-  - [ ] Post pages display titles.
-  - [ ] GA snippet only loads after consent.
+- [X] Deploy changes to GitHub Pages (publish branch and wait for build).
+- [X] Validate locally with `bundle exec jekyll serve`, confirming:
+  - [X] Post pages display titles.
+  - [X] GA snippet only loads after consent.
 - [ ] Use browser devtools to confirm GA requests anonymise IP and respect consent state.
 - [ ] Re-run Google Search Console verification using the GA method.
 - [ ] Smoke-test GA real-time dashboard to ensure page views register after consent.

@@ -9,6 +9,7 @@
   var prefsSelector = '[data-cookie-preferences]';
   var consentState = null;
   window['ga-disable-' + GA_ID] = true;
+  var gaConfigured = false;
 
   function safeGet(key) {
     try {
@@ -41,25 +42,24 @@
     document.body.setAttribute('data-ga-consent', value || 'unset');
   }
 
-  function loadGA() {
-    if (window.__gaLoaded) { return; }
+  function enableAnalytics() {
     window['ga-disable-' + GA_ID] = false;
-
-    var script = document.createElement('script');
-    script.async = true;
-    script.src = 'https://www.googletagmanager.com/gtag/js?id=' + GA_ID;
-    document.head.appendChild(script);
-
-    window.dataLayer = window.dataLayer || [];
-    function gtag(){ window.dataLayer.push(arguments); }
-    window.gtag = gtag;
-    gtag('js', new Date());
-    gtag('config', GA_ID, { 'anonymize_ip': true });
-
-    window.__gaLoaded = true;
+    if (typeof window.gtag === 'function') {
+      window.gtag('consent', 'update', { 'analytics_storage': 'granted' });
+      if (!gaConfigured) {
+        window.gtag('config', GA_ID, { 'anonymize_ip': true });
+        gaConfigured = true;
+      } else {
+        window.gtag('event', 'page_view', {
+          'page_location': window.location.href,
+          'page_path': window.location.pathname,
+          'page_title': document.title
+        });
+      }
+    }
   }
 
-  function disableGA() {
+  function disableAnalytics() {
     window['ga-disable-' + GA_ID] = true;
     if (typeof window.gtag === 'function') {
       window.gtag('consent', 'update', { 'analytics_storage': 'denied' });
@@ -97,14 +97,14 @@
       removeBanner();
       safeSet(CONSENT_KEY, 'denied');
       setBodyState('denied');
-      disableGA();
+      disableAnalytics();
     });
 
     acceptBtn.addEventListener('click', function () {
       removeBanner();
       safeSet(CONSENT_KEY, 'granted');
       setBodyState('granted');
-      loadGA();
+      enableAnalytics();
     });
 
     document.body.appendChild(banner);
@@ -115,7 +115,7 @@
     if (event) { event.preventDefault(); }
     removeBanner();
     safeSet(CONSENT_KEY, null);
-    disableGA();
+    disableAnalytics();
     setBodyState('unset');
     showBanner(true);
   }
@@ -123,10 +123,10 @@
   consentState = safeGet(CONSENT_KEY);
   if (consentState === 'granted') {
     setBodyState(consentState);
-    loadGA();
+    enableAnalytics();
   } else if (consentState === 'denied') {
     setBodyState(consentState);
-    disableGA();
+    disableAnalytics();
   } else {
     setBodyState('unset');
     showBanner(false);
