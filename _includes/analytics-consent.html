@@ -9,7 +9,6 @@
   var prefsSelector = '[data-cookie-preferences]';
   var consentState = null;
   window['ga-disable-' + GA_ID] = true;
-  var gaConfigured = false;
 
   function safeGet(key) {
     try {
@@ -44,19 +43,13 @@
 
   function enableAnalytics() {
     window['ga-disable-' + GA_ID] = false;
-    if (typeof window.gtag === 'function') {
-      window.gtag('consent', 'update', { 'analytics_storage': 'granted' });
-      if (!gaConfigured) {
-        window.gtag('config', GA_ID, { 'anonymize_ip': true });
-        gaConfigured = true;
-      } else {
-        window.gtag('event', 'page_view', {
-          'page_location': window.location.href,
-          'page_path': window.location.pathname,
-          'page_title': document.title
-        });
-      }
-    }
+    if (typeof window.gtag !== 'function') { return; }
+    window.gtag('consent', 'update', { 'analytics_storage': 'granted' });
+    window.gtag('event', 'page_view', {
+      'page_location': window.location.href,
+      'page_path': window.location.pathname,
+      'page_title': document.title
+    });
   }
 
   function disableAnalytics() {

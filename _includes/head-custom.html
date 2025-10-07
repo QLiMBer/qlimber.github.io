@@ -77,5 +77,6 @@
   function gtag(){dataLayer.push(arguments);}
   gtag('js', new Date());
   gtag('consent', 'default', { 'analytics_storage': 'denied' });
+  gtag('config', '{{ site.ga_measurement_id | strip }}', { 'anonymize_ip': true, 'send_page_view': false });
 </script>
 {% endif %}
